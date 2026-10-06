@@ -1,0 +1,43 @@
+# Archivos auxiliares de LaTeX y latexmk
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.synctex
+*.synctex.gz
+*.synctex(busy)
+*.synctex.gz(busy)
+*.toc
+*.lof
+*.lot
+*.out
+*.loa
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+*.idx
+*.ind
+*.ilg
+*.glo
+*.gls
+*.glg
+*.acn
+*.acr
+*.alg
+*.nav
+*.snm
+*.vrb
+*.xdv
+*.dvi
+*.spl
+*.fdb
+
+# Documentos compilados
+*.pdf
+*.ps
+
+# Carpetas de compilación
+build/
+out/
+_minted*/
