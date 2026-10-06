@@ -1,0 +1,293 @@
+\documentclass{article}
+
+%Symbols
+\usepackage{fdsymbol}
+\usepackage{amsmath}
+
+%Header-Footer
+\usepackage{fancyhdr}
+\cfoot{\thepage}
+\rfoot{C\'esar Hern\'andez Cruz}
+\lhead{Tarea 1}
+\rhead{\textsc{An\'alisis de Algoritmos}}
+%\pagenumbering{gobble}
+
+\renewcommand\headrulewidth{1.5pt}
+\makeatletter
+\def\headrule{{\if@fancyplain\let\headrulewidth\plainheadrulewidth\fi
+\hrule\@height\headrulewidth\@width\headwidth
+\vskip-\headrulewidth
+\vskip-1.5pt}}
+\makeatother
+
+%Margins
+\usepackage{geometry}
+%The cake is a lie
+\addtolength{\hoffset}{-0.2cm}
+\addtolength{\textwidth}{0.4cm}
+\addtolength{\voffset}{-0.5cm}
+\addtolength{\textheight}{1cm}
+
+%Algorithms
+\usepackage[ruled,vlined,linesnumbered,onelanguage]{algorithm2e}
+\SetKwInput{KwIn}{Entrada}
+\SetKwInput{KwOut}{Salida}
+\SetKw{KwAnd}{\textbf{and}}
+\SetKw{KwOr}{\textbf{or}}
+\SetKw{KwExchange}{intercambia}
+
+
+\pagestyle{fancyplain}
+
+%User defined
+\newcommand{\Sol}{\textbf{Soluci\'on:} \ }
+\newcommand{\set}[1]{\left\{ #1 \right\}}
+\newcommand{\setdef}[2]{\left\{ #1 \colon\ #2 \right\}}
+\newcommand{\brac}[1]{\left( #1 \right)}
+
+
+\begin{document}
+\begin{enumerate}
+    \item Considere la siguiente variante de \textsc{Quicksort}.
+
+        \begin{minipage}[H]{0.943\textwidth}
+        \begin{algorithm}[H]
+            \DontPrintSemicolon
+            \KwIn{Un arreglo $A$ y dos enteros $p$ y $r$.}
+            \KwOut{El mismo arreglo $A$, ordenado.}
+            \SetKwProg{Fn}{Algoritmo}{:}{}
+            \Fn{$\textsc{OtroQuicksort}(A, p, r)$}{
+                \While{$p < r$}{
+                    $q \gets \textsc{Particion}(A, p, r)$\;
+                    $\textsc{OtroQuicksort}(A,p,q-1)$\;
+                    $p \gets q+1$
+                }
+            }
+            \caption{\textsc{OtroQuicksort}}
+        \end{algorithm}
+        \end{minipage}
+
+        \begin{enumerate}
+            \item Explique en alto nivel qu\'e hace \textsc{OtroQuicksort} y
+                en qu\'e difiere de la versi\'on cl\'asica.
+
+            Este algoritmo es muy similar al Quicksort original, excepto que este en lugar de hacer dos llamadas recursivas
+            para ordenar las dos mitades del arreglo (mitades que están dadas por el índice del pivote q al igual que el algoritmo originla), solo hace la
+            llamada recursiva para ordenar la mitad de la izquierda y después hace la iteración del ciclo while para ordenar
+            segunda mitad (derecha) ya con el índice p actualizado a q+1. Y nuevamete esta segunda mitad es ordenada de la misma manera.
+            
+            \medskip
+            \textbf{**Aclaración**: Cuando digo mitades quiero decir subarreglos, para que no haya confusión.}
+            \medskip
+
+            \item Demuestre que al ejecutar $\textsc{OtroQuicksort}(A, 0,
+                |A|-1)$ el arreglo $A$ se ordena correctamente.
+
+            Bueno pues puedo mostrar que funciona el algoritmo por inducción siguiendo la longitud del arreglo:
+
+            \textbf{Caso base:} Si el arreglo tiene longitud 1 (o menor), entonces p = r (o en otro caso $p > r$) y el ciclo while no se ejecuta, por lo que el arreglo queda ordenado.
+            Y en realidad no impora que el algoritmo no se ejecute en este paso pues cómo sabemos, un arreglo de longitud menor o igual a 1 ya está ordenado.
+            
+            \medskip
+            
+            
+            \textbf{HI} Supongamos que el algoritmo funciona para arreglos de longitud menor a n.
+
+            \medskip
+            \textbf{Paso inductivo:} 
+            Ahora tomemos un arreglo A de longitud n. Al incio de ejecutar el alg. se llama a la función Particion(A, p, r) que nos devuelve un índice q tal que todos los elementos
+            a la izquierda de q son menores o iguales al elemento en A[q] y todos los elementos a la derecha de q son mayores o iguales al elemento A[q] (justo como lo vimos en clase).
+            Ahora el sig. paso es hacer la llamada recursiva a OtroQuicksort(A, p, q-1) que por la hipótesis inductiva sabemos que ordenará correctamente el subarreglo A[p..q-1] ya
+            que su longitud es menor a n (ya que incluso en el peor de los casos quitamos solamente al pivote del arreglo).
+            Ahora el siguiente paso es actualizar p a q+1 y volver a ejecutar el ciclo while, lo que nos llevará a hacer la llamada recursiva a OtroQuicksort(A, q+1, r) que por la
+            hipótesis inductiva sabemos que ordenará correctamente el subarreglo A[q+1..r] ya que su longitud es menor a n (ya que incluso en el peor de los casos quitamos solamente
+            al pivote del arreglo). Por lo tanto, al final de ejecutar el algoritmo, tendremos que A[p..q-1] y A[q+1..r] están ordenados y además todos los elementos de A[p..q-1] son 
+            menores o iguales al elemento A[q] y todos los elementos de A[q+1..r] son mayores o iguales al elemento A[q] (el cual ya está en su lugar desde la primer ejecución de Particion), por lo que podemos concluir que el arreglo A está ordenado correctamente.
+
+            \medskip
+            Entonces en particular se cumple para...$\textsc{OtroQuicksort}(A, 0,
+                |A|-1)$
+
+            \item Describa un caso donde la altura de la recursi\'on al ejecutar
+                sea $\Theta(n)$ para un arreglo de longitud $n$.  Justifique su
+                respuesta.
+
+            Un caso dónde la alura de la pila de recursión sea $\Theta(n)$ es justamente el peor caso de
+            Quicksort, querer ordenar un arreglo que ya está ordenado (ya sea de manera ascendente o descendente)
+            y que el pivote elegido sea siempre el último o el primer elemento del arreglo.
+            
+            \medskip
+            Ya que cuando acamodamos el pivote en su posición (SPG en la posición final) del lado izquierdo nos
+            quedan n-1 elementos, a los cuales les volvemos a aplicar OtroQuicksort (del lado izquierdo nos quedan n-2 elem.) y así sucesivamente hasta que nos quedemos con un subarreglo de longitud 1.
+            Lo que nos deja una altura de la pila de recursión de n (contando la llamada incial), que es $\Theta(n)$.
+
+            
+            \item Sin alterar el tiempo promedio de ejecuci\'on (es decir, $O(n
+                \log n)$), modifique \textsc{OtroQuicksort} para que la altura
+                de la recursi\'on sea $\Theta(\log n)$ en el peor caso.
+
+            Como sabemos que OtroQuickSort va apilando llamadas recursivas primero unicamente
+            del lado izquierdo, y también sabemos que en el peor de los casos del algoritmo
+            se van apilando k-1 llamadas en cada paso k. Y también sabemos que este inciso
+            nos pide que la altura de la pila de recursión sea $\Theta(\log n)$ en el peor caso, para
+            lograr esto debemos hacer que el agoritmo solamente apile llamadas cuando el tamaño del
+            subarreglo sea a lo más la mitad del tamaño de n. Con esto lograremos una "convergencia
+            logaritmica" (por así decirlo) de la altura. Ya que si emopezamos a dividir n/2 hasta
+            llegar a 1, estos nos llevara justamente $\log n$ pasos. oOk, entonces para lograr esto, podemos
+            enviar únicamente el subarreglo pequeño a la recursión pues sabemos que este va a tener a lo más
+            n/2 elementos (es el caso dónde ambos subarreglos son iguales en longitud) pero a lo menos tendrá
+            0 elementos (el peor de los casos para la altura de recursión, y cómo hay cero elementos, ni siquiera
+            se empiezan a apilar cosas en la pila). El lado faltante lo ejecutamos de manera iterativa con el
+            flujo natural del while (en el cual no se ocupa apilar nada en la pila). Así vamos a lograr que
+            la máxima altura de la pila de recursión sea $\Theta(\log n)$ en el peor caso.
+
+            
+            \noindent\begin{minipage}{\linewidth}
+            \begin{algorithm}[H]
+                \DontPrintSemicolon
+                \KwIn{Un arreglo $A$ y dos enteros $p$ y $r$.}
+                \KwOut{El mismo arreglo $A$, ordenado.}
+                \SetKwProg{Fn}{Algoritmo}{:}{}
+                \Fn{$\textsc{OtroQuicksortModificado}(A,p,r)$}{
+                    \While{$p < r$}{
+                        $q \gets \textsc{Particion}(A,p,r)$\;
+                        \eIf{$q-p \leq r-q$}{
+                            $\textsc{OtroQuicksortModificado}(A,p,q-1)$\;
+                            $p \gets q+1$\;
+                        }{
+                            $\textsc{OtroQuicksortModificado}(A,q+1,r)$\;
+                            $r \gets q-1$\;
+                        }
+                    }
+                }
+                \caption{\textsc{OtroQuicksortModificado}}
+            \end{algorithm}
+            \end{minipage}
+
+            
+        \end{enumerate}
+
+    \item Dados dos enteros positivos $n$ y $k$ y un arreglo $A$, describa un
+        algoritmo que encuentre los $k$ elementos m\'as peque\~nos de $A$ y los
+        devuelva, en orden, en un arreglo de salida $B$.   El algoritmo debe
+        tener un tiempo de ejecuci\'on, en el peor caso, de $O(n \log k)$.
+        Demuestre que su algoritmo es correcto y la cota de tiempo es la
+        deseada.
+
+
+        \medskip
+
+    \item Entre 1966 y 2004, la UNAM tuvo un sistema de calificaciones con
+        letras en lugar de n\'umeros:
+        \begin{itemize}
+            \item \textsf{MB} - Muy bien, equivalente a 10.
+            \item \textsf{B} - Bien, equivalente a 8.
+            \item \textsf{S} - Suficiente, equivalente a 6.
+            \item \textsf{NA} - No Acreditado, 5 o menos.
+            \item \textsf{NP} - No Presentado.
+        \end{itemize}
+        Exhiba un algoritmo que, dada una lista de $n$ estudientes, la ordene
+        por calificaci\'on, i.e., primero a todos los estudiantes con
+        calificaci\'on \textsf{MB}, despu\'es a quienes tienen calificaci\'on
+        \textsf{B}, etc.   Su algoritmo debe usar tiempo a lo m\'as $O(n)$ y
+        espacio $O(1)$.   Adem\'as, su algoritmo debe ser estable (si los
+        estudiantes $i$ y $j$ tienen la misma calificaci\'on e $i$ aparec\'ia
+        antes que $j$ en la lista original, tambi\'en debe suceder que $i$
+        aparezca antes que $j$ en la lista ordenada).
+
+    \item ?`Cu\'antas comparaciones son necesarias y suficientes para ordenar
+        una lista con 5 elementos?   Justifique su respuesta.
+
+    \item Dados dos arreglos ordenados $A$ y $B$ de longitud $n$ y $m$,
+        respectivamente, exhiba algoritmos de tiempo $O(n+m)$ que calcule:
+        \begin{enumerate}
+            \item El punto medio de la uni\'on ordenada de ambos arreglos.
+            \item La diferencia sim\'etrica de $A$ y $B$ sin repeticiones.
+        \end{enumerate}
+
+    \item Considere el siguiente algoritmo.
+    
+        \begin{minipage}[H]{0.943\textwidth}
+        \begin{algorithm}[H]
+            \DontPrintSemicolon
+            \KwIn{Un arreglo $A$.}
+            \SetKwProg{Fn}{Rutina}{:}{}
+            \Fn{$\textsc{Algoritmo}(A)$}{
+                $i \gets 0$\;
+                \While{$i < |A|$}{
+                    \If{$i = 0$ \KwOr $A[i-1] \le A[i]$}{
+                        $i \gets i+1$\;
+                    }
+                    \Else{
+                        \KwExchange $A[i]$ con $A[i-1]$\;
+                        $i \gets i-1$\;
+                    }
+                }
+            }
+            \caption{\textsc{Algoritmo}}
+        \end{algorithm}
+        \end{minipage}
+        \begin{enumerate}
+            \item Describa en alto nivel qu\'e hace \textsc{Algoritmo} y c\'omo
+                lo hace.
+            \item Demuestre que \textsc{Algoritmo} es correcto respecto a su
+                respuesta del inciso anterior.
+            \item Analice la complejidad de \textsc{Algoritmo} en el peor caso.
+            \item Analice la complejidad de \textsc{Algoritmo} en el mejor caso.
+        \end{enumerate}
+
+    \item Considere el siguiente algoritmo de ordenamiento.   Dado un arreglo
+        $A$, para cada posici\'on $i$ en el arreglo, nuestro algoritmo determina
+        cu\'al es la posici\'on final $j$ del elemento $A[i]$, esto lo logra
+        contando cu\'antos elementos hay a la derecha de la posici\'on $i$ que
+        son menores que $A[i]$.   Al intercambiar $A[i]$ con $A[j]$, sabemos que
+        el elemento en $A[j]$ ya est\'a en su posici\'on correcta.  Si tras el
+        cambio el elemento en $A[i]$ ya est\'a en su posici\'on correcta, el
+        \'indice $i$ avanza una posici\'on a la derecha.    Si no, el
+        procedimiento se repite hasta que $A[i]$ esté en su posici\'on correcta.
+        \begin{enumerate}
+            \item Formalice la idea anterior mediante pseudoc\'odigo. Considere
+                que puede haber elementos duplicados en el arreglo. El n\'umero
+                total de escrituras en memoria debe ser a lo m\'as $|A|-1$.
+            \item ?`Cu\'al es el tiempo de ejecuci\'on en el peor caso?
+                Justifique su respuesta.
+            \item Demuestre que si las entradas del arreglo son los enteros $0,
+                \dots, |A|-1$, entonces el algoritmo puede modificarse para
+                tener tiempo de ejecuci\'on $O(n)$.
+            \item Exhiba un algoritmo que, dado un arreglo de longitud $n$ y
+                cuyas entradas son n\'umeros entre $0$ y $n-1$ con exactamente
+                un n\'umero faltante y un n\'umero duplicado, encuentre c\'ual
+                es el n\'umero faltante y cu\'al el duplicado en tiempo $O(n)$.
+        \end{enumerate}
+
+    \item Sea $m$ un entero y $A$ un arreglo con $n$ entradas entre $0$ y $m-1$.
+        \begin{enumerate}
+            \item Si $m \in O(n)$, ?`es posible ordenar $A$ en tiempo $O(n)$?
+            
+            \medskip
+            \Sol Sí es posible ordenarlo, y usando esta nueva información que sabemos
+            podemos usar el algoritmo de CountingSort, que vimos en clase y además tiene la
+            característica de que es estable y su tiempo de ejecución es $O(n+k)$ donde $k$ es el rango de los elementos a ordenar, en este caso $k = m$.
+            Entonces, si $m \in O(n)$, el tiempo $O(n+k) = O(n+m)$ es absorbido brutalmente por $O(n)$, por lo que podemos decir que sí.
+
+            \item Si $m \in O(n^2)$, ?`es posible ordenar $A$ en tiempo O$(n)$?
+            \medskip
+            \Sol Aquí si cambia un poco la cosa, que que si intentamos usar Counting, su complejidad
+            temporal ahora sería $O(n+m) = O(n+n^2) = O(n^2)$. Pero qué pasa si en este caso usamos
+            Raddix sort (también visto en clase) con números escritos en base $n$, entonces el tiempo de ejecución sería $O(d(n+b))$ donde $d$ es
+             el número de dígitos y $b$ es la base, en este caso $b = n$. Y como sabemos que $m \in O(n^2)$,
+              entonces el número de dígitos $d$ es constante. Y miren a continuación muestro matemáticamente como se representarían :
+               si $0 \leq x < n^2$ y $n \geq 2$, escribimos $x = an+c$, donde $a = \lfloor x/n \rfloor$ y $c = x \bmod n$; el cociente y el residuo son sus dos dígitos en base $n$, ambos entre $0$ y $n-1$. Si $m$ supera $n^2$ por un factor constante, pueden necesitarse más dígitos, pero su cantidad sigue siendo constante.
+               Entonces el tiempo de ejecución sería $O(d(n+n)) = O(n)$.
+            
+        \end{enumerate}
+
+    \item Dada una cadena de texto de longitud $n$, sobre un alfabeto de
+        tama\~no $k$, exhiba un algoritmo que tras un preprocesamiento de tiempo
+        $O(kn)$ pueda responder cualquier consulta respecto a cu\'antas veces
+        aparece un s\'imbolo en un rango de \'indices en tiempo $O(1)$, por
+        ejemplo, ?`cu\'antas veces aparece la letra 'v' en el rango $[28, 56]$?
+        Demuestre que su algoritmo es correcto y cumple con la cota de tiempo
+        requerida.
+\end{enumerate}
+\end{document}
