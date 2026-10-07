@@ -56,7 +56,7 @@
             \KwIn{Un arreglo $A$ y dos enteros $p$ y $r$.}
             \KwOut{El mismo arreglo $A$, ordenado.}
             \SetKwProg{Fn}{Algoritmo}{:}{}
-            \Fn{$\textsc{OtroQuicksort}(A, p, r)$}{
+            \Fn{$\textnormal{\textsc{OtroQuicksort}}(A, p, r)$}{
                 \While{$p < r$}{
                     $q \gets \textsc{Particion}(A, p, r)$\;
                     $\textsc{OtroQuicksort}(A,p,q-1)$\;
@@ -148,7 +148,7 @@
                 \KwIn{Un arreglo $A$ y dos enteros $p$ y $r$.}
                 \KwOut{El mismo arreglo $A$, ordenado.}
                 \SetKwProg{Fn}{Algoritmo}{:}{}
-                \Fn{$\textsc{OtroQuicksortModificado}(A,p,r)$}{
+                \Fn{$\textnormal{\textsc{OtroQuicksortModificado}}(A,p,r)$}{
                     \While{$p < r$}{
                         $q \gets \textsc{Particion}(A,p,r)$\;
                         \eIf{$q-p \leq r-q$}{
@@ -195,6 +195,60 @@
         antes que $j$ en la lista original, tambi\'en debe suceder que $i$
         aparezca antes que $j$ en la lista ordenada).
 
+        \medskip
+        \Sol Como el problema nos dice que nos dan una lista de estudiantes, suponemos que la entrada es una lista simplemente ligada y que
+        podemos modificar los apuntadores de sus nodos. Recorremos la lista y
+        agregamos cada nodo al final del grupo correspondiente a su
+        calificaci\'on, reutilizando los nodos originales. Al terminar,
+        concatenamos los grupos en el orden MB, B, S, NA, NP. Como solo guardamos
+        las referencias a los inicios y finales de los cinco grupos y unas pocas
+        variables auxiliares, sin crear nodos nuevos, el espacio extra que
+        usamos es constante $O(1)$.
+
+        \noindent\begin{minipage}{\linewidth}
+        \begin{algorithm}[H]
+            \DontPrintSemicolon
+            \KwIn{Una lista simplemente enlazada $L$ de estudiantes.}
+            \KwOut{La cabeza de la lista ordenada por calificaci\'on.}
+            \SetKwProg{Fn}{Algoritmo}{:}{}
+            \Fn{$\textnormal{\textsc{OrdenarPorCalificacion}}(L)$}{
+                $C \gets [\textsf{MB},\textsf{B},\textsf{S},\textsf{NA},\textsf{NP}]$\;
+                \ForEach{$c$ en $C$}{
+                    $inicio[c] \gets \mathrm{NULL}$\;
+                    $final[c] \gets \mathrm{NULL}$\;
+                }
+                $actual \gets cabeza(L)$\;
+                \While{$actual \neq \mathrm{NULL}$}{
+                    $siguiente \gets actual.siguiente$\;
+                    $actual.siguiente \gets \mathrm{NULL}$\;
+                    $c \gets actual.calificacion$\;
+                    \eIf{$inicio[c] = \mathrm{NULL}$}{
+                        $inicio[c] \gets actual$\;
+                        $final[c] \gets actual$\;
+                    }{
+                        $final[c].siguiente \gets actual$\;
+                        $final[c] \gets actual$\;
+                    }
+                    $actual \gets siguiente$\;
+                }
+                $cabezaNueva \gets \mathrm{NULL}$\;
+                $colaNueva \gets \mathrm{NULL}$\;
+                \ForEach{$c$ en $C$}{
+                    \If{$inicio[c] \neq \mathrm{NULL}$}{
+                        \eIf{$cabezaNueva = \mathrm{NULL}$}{
+                            $cabezaNueva \gets inicio[c]$\;
+                        }{
+                            $colaNueva.siguiente \gets inicio[c]$\;
+                        }
+                        $colaNueva \gets final[c]$\;
+                    }
+                }
+                \KwRet{$cabezaNueva$}\;
+            }
+            \caption{Ordenamiento por calificaci\'on de letras.}
+        \end{algorithm}
+        \end{minipage}
+
     \item ?`Cu\'antas comparaciones son necesarias y suficientes para ordenar
         una lista con 5 elementos?   Justifique su respuesta.
 
@@ -212,7 +266,7 @@
             \DontPrintSemicolon
             \KwIn{Un arreglo $A$.}
             \SetKwProg{Fn}{Rutina}{:}{}
-            \Fn{$\textsc{Algoritmo}(A)$}{
+            \Fn{$\textnormal{\textsc{Algoritmo}}(A)$}{
                 $i \gets 0$\;
                 \While{$i < |A|$}{
                     \If{$i = 0$ \KwOr $A[i-1] \le A[i]$}{
@@ -230,11 +284,137 @@
         \begin{enumerate}
             \item Describa en alto nivel qu\'e hace \textsc{Algoritmo} y c\'omo
                 lo hace.
+                
+                \Sol el algoritmo recorre el arreglo de izquierda a derecha,
+                compara dos cosas en cada iteración: si el indice actual es 0
+                o si el elemento anterios es menor o igual al elemento actual, si es
+                verdadera alguna de estás son comparaciones, etonces el índice se incrementa.
+
+                Si no, entonces el elemento actual se intercambia con el
+                anterior y decrementamos el índice para ahora comparar a partir del elemento anterior, esto
+                va a hacer que sigamos retrocediendo de índice y desplazando elementos hasta que el elemento más pequeño de
+                esa iteración encuentre su posición correcta.
+                 Esto se repite hasta que el índice sea igual a la longitud del arreglo.
+
+                 \textbf{Y en más alto nivel}: el algoritmo ordena el arreglo de manera ascendente, desplazando elementos hacia la izquierda hasta que cada elemento encuentre su posición correcta.
+
+                 
+            
             \item Demuestre que \textsc{Algoritmo} es correcto respecto a su
                 respuesta del inciso anterior.
+
+                 \Sol Entonces para demostarlo voy a ocupar un invariante de ciclo while
+                
+                \medskip
+                 \textbf{Invariante:} Antes de procesar el índice $i$ en el ciclo, los elemento en $A[0..i-1]$ están ordenados de manera ascendente.
+                
+                 \textbf{Inicialización}: Cuando $i=0$, el subarreglo $A[0..-1]$ está vacío y por vacuidad ($\emptyset$) está ordenado.
+
+                 \textbf{Mantenimiento}: Supongamos que el invariante se cumple al inicio de una iteración.
+            
+                 Si $i=0$, el algoritmo incrementa $i$. Con esto el subarreglo izquierdo contiene un
+                 solo elemento, por lo que se encuentra ordenado.
+                 Si $i>0$ y además
+                 \[
+                 A[i-1]\leq A[i],
+                 \]
+                 por hipótesis $A[0..i-1]$ ya se encuentra ordenado. Como además
+                 $A[i-1]\leq A[i]$, al incorporar $A[i]$ obtenemos que
+                 \[
+                 A[0..i]
+                 \]
+                 también se encuentra ordenado. Después se incrementa $i$, por lo que
+                 el invariante vuelve a cumplirse.
+                 Pero si
+                 \[
+                 A[i-1]>A[i],
+                 \]
+                 el algoritmo intercambia $A[i]$ con $A[i-1]$ y decrementa $i$.
+                 Si el valor anterior del índice era $j$, el nuevo valor es
+                 $i=j-1$. El invariante ahora únicamente nos pide que
+                 \[
+                 A[0..j-2]
+                 \]
+                 se encuentre ordenado. Este subarreglo no fue modificado por el
+                 intercambio y era un subarreglo izquierdo del subarreglo ordenado
+                 $A[0..j-1]$. Por lo tanto, continúa ordenado.
+                 Ok, con esto ya vimos que el invariante se mantiene después de procesar el índice $i$ en el while.
+                 \medskip
+
+
+                 \textbf{Terminación.}
+
+                El ciclo termina cuando ($i=|A|$). Por el invariante,
+                [
+                $A[0..i-1]=A[0..|A|-1]$
+                ]
+                se encuentra ordenado, por lo que todo el arreglo (A) está ordenado
+                de manera creciente. 
+
+
+                Y ya por último, como el algoritmo únicamente intercambia elementos in place,
+                $A$ conserva los mismos elementos del arreglo original. Por lo
+                tanto, \textsc{Algoritmo} es correcto.
+
+                   \medskip
+
+            
             \item Analice la complejidad de \textsc{Algoritmo} en el peor caso.
+                        \textbf{Peor caso.}
+
+            El peor caso ocurre cuando el arreglo se encuentra ordenado de manera
+            estrictamente decreciente. En este caso hay el máximo número posible de pares de elementos fuera de orden:
+
+            $
+            \frac{n(n-1)}{2}.
+            $
+
+            Cada vez que el algoritmo encuentra que
+            
+            $A[i-1]>A[i]$,
+            
+            intercambia ambos elementos y decrementa $i$. Como cada intercambio
+            entre elementos adyacentes desordenados elimina un par de elementos fuera de orden, en el peor caso se
+            realizan
+
+           $ 
+            \frac{n(n-1)}{2}
+            $
+
+            intercambios. Por lo tanto, el tiempo de ejecución en el peor caso es
+
+            
+            $\Theta(n^2)$
+            
+
+            \medskip
+
+
+
             \item Analice la complejidad de \textsc{Algoritmo} en el mejor caso.
+            \textbf{Mejor caso.}
+
+            El mejor caso es cuando el arreglo ya se encuentra ordenado de manera
+            creciente. En este caso siempre se cumple
+
+            
+            $A[i-1]\leq A[i],
+            $
+
+            por lo que el algoritmo nunca realiza intercambios ni decrementa $i$.
+            El índice solo va avanzando desde 0 hasta $|A| = n$
+
+            Por lo tanto, el tiempo de ejecución en el mejor caso es
+
+            $
+            \Theta(n).
+            $
+
+
+
         \end{enumerate}
+
+     
 
     \item Considere el siguiente algoritmo de ordenamiento.   Dado un arreglo
         $A$, para cada posici\'on $i$ en el arreglo, nuestro algoritmo determina
