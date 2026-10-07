@@ -464,10 +464,81 @@
 
     \item Dada una cadena de texto de longitud $n$, sobre un alfabeto de
         tama\~no $k$, exhiba un algoritmo que tras un preprocesamiento de tiempo
-        $O(kn)$ pueda responder cualquier consulta respecto a cu\'antas veces
+        $O(kn)$ pueda responder cualquier consulta respectso a cu\'antas veces
         aparece un s\'imbolo en un rango de \'indices en tiempo $O(1)$, por
         ejemplo, ?`cu\'antas veces aparece la letra 'v' en el rango $[28, 56]$?
         Demuestre que su algoritmo es correcto y cumple con la cota de tiempo
         requerida.
+
+        \medskip
+        \Sol Podemos usar una matriz de conteos acumulados $A$ de tama\~no
+        $(n+1)\times k$ ($n+1$ filas para contemplar los casos dónde el usuario consulta el rango $[0, n]$, o solamente se equivoco jajaja y necesitamos contemplar que en el índice 0 no se ha procesado nada pues no hay nada aún). Cada columna corresponde a un s\'imbolo del alfabeto
+        y $A[t,c]$ guarda cu\'antas veces aparece el s\'imbolo $c$ en los
+        primeros $t$ caracteres de la cadena. Hacemos un mapeo de los símboles
+        del alfabeto a los enteros $0, \dots, k-1$ para poder manejar la matriz mejr.
+
+        Y ahora, para construir cada fila siguiente, copiamos los conteos
+        de la fila anterior y sumamos 1 en la columna del car\'acter actual que leímos.
+
+        Ya más formalmente así quedaía:
+
+        \noindent\begin{minipage}{\linewidth}
+        \begin{algorithm}[H]
+            \DontPrintSemicolon
+            \KwIn{Una cadena $C$ de longitud $n$ y un alfabeto de tama\~no $k$.}
+            \KwOut{Una matriz $A$ de conteos acumulados.}
+            \SetKwProg{Fn}{Algoritmo}{:}{}
+            \Fn{$\textnormal{\textsc{Preprocesar}}(C,k)$}{
+                $n \gets |C|$\;
+                Crear una matriz $A$ de tama\~no $(n+1)\times k$\;
+                \For{$c\gets 0$ \KwTo $k-1$}{
+                    $A[0,c]\gets 0$\;
+                }
+                \For{$i\gets 0$ \KwTo $n-1$}{
+                    \For{$c\gets 0$ \KwTo $k-1$}{
+                        $A[i+1,c]\gets A[i,c]$\;
+                    }
+                    $A[i+1,C[i]]\gets A[i+1,C[i]]+1$\;
+                }
+                \KwRet{$A$}\;
+            }
+            \caption{Preprocesamiento de la cadena}
+        \end{algorithm}
+        \end{minipage}
+
+        Para responder una consulta cómo la del ejemplo sobre el s\'imbolo $c$ en el rango
+        $[inicio,fin]$, incluyendo ambos extremos, usamos
+        \[
+            A[fin+1,c]-A[inicio,c].
+        \]
+
+        \noindent\begin{minipage}{\linewidth}
+        \begin{algorithm}[H]
+            \DontPrintSemicolon
+            \KwIn{La matriz $A$, un s\'imbolo $c$ y un rango $0\leq inicio\leq fin<n$.}
+            \KwOut{El n\'umero de apariciones de $c$ en el rango $[inicio,fin]$.}
+            \SetKwProg{Fn}{Algoritmo}{:}{}
+            \Fn{$\textnormal{\textsc{Consultar}}(A,c,inicio,fin)$}{
+                \KwRet{$A[fin+1,c]-A[inicio,c]$}\;
+            }
+            \caption{Consulta de apariciones en un rango}
+        \end{algorithm}
+        \end{minipage}
+
+        \medskip
+        \textbf{Dem.} La fila 0 representa correctamente el conteo
+        de una cadena vac\'ia cómo dije al principio. Si la fila $i$ contiene los conteos correctos
+        de los primeros $i$ caracteres, al copiarla y sumar 1 solamente
+        en la columna de $C[i]$, la fila $i+1$ contiene los conteos correctos
+        de los primeros $i+1$ caracteres. Por inducci\'on, todas las filas
+        son correctas. Como los primeros $fin+1$ caracteres se dividen en los
+        primeros $inicio$ caracteres y el rango $[inicio,fin]$, la diferencia de sus
+        conteos devuelve exactamente las apariciones solicitadas.
+
+        \medskip
+        \textbf{Complejidad.} Inicializar la fila 0 (dónde todo es cero) cuesta $O(k)$.
+        Para cada uno de los $n$ caracteres copiamos $k$ conteos y
+        actualizamos uno, por lo que el preprocesamiento cuesta $O(nk)$. Cada consulta hace dos accesos a la matriz y una
+        resta, por lo que cuesta $O(1)$. Ah y la matriz ocupa espacio $O(nk)$.
 \end{enumerate}
 \end{document}
